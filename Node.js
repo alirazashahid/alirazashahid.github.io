@@ -3,10 +3,10 @@ const express = require('express');
 const app = express();
 const mysql = require('mysql2/promise');
 
-const dbHost = 'localhost';
-const dbUser = 'root';
-const dbPassword = '';
-const dbName = 'videos';
+const dbHost = 'sql305.infinityfree.com';
+const dbUser = 'if0_37763535';
+const dbPassword = 'wsTLWNpFHtoByp ';
+const dbName = 'if0_37763535_videos';
 
 const pool = mysql.createPool({
     host: dbHost,
