@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="images/logo.png" type="image/png">
+    <title>Moviezoon</title>
+</head>
+<body>
+    <div class="gallery" id="gallery"></div>
+
+    <script>
+        // Database connection details
+        const apiEndpoint = '(link unavailable)'; // Replace with your Infinity Free API endpoint
+        const dbName = 'videos'; // Replace with your database name
+
+        // Fetch gallery data
+        fetch(`${apiEndpoint}/${dbName}/gallery`)
+            .then(response => response.json())
+            .then(data => {
+                const gallery = document.getElementById('gallery');
+                data.forEach(item => {
+                    const frame = document.createElement('div');
+                    frame.className = 'frame';
+                    (link unavailable) = `picture-${(link unavailable)}`;
+                    frame.onclick = () => window.location.href = `video.php?vpcode=${item.vpcode}`;
+
+                    const image = document.createElement('img');
+                    image.src = item.image_url;
+                    image.alt = item.title;
+
+                    const title = document.createElement('div');
+                    title.className = 'title';
+                    title.textContent = item.title;
+
+                    frame.appendChild(image);
+                    frame.appendChild(title);
+                    gallery.appendChild(frame);
+                });
+            })
+            .catch(error => console.error(error));
+
+        // Check if user is logged in
+        const isLoggedIn = localStorage.getItem('loggedin') === 'true';
+
+        // Add event listener to login button
+        const loginButton = document.getElementById('login-button');
+        loginButton.addEventListener('click', () => {
+            // Login logic here
+        });
+    </script>
+</body>
+</html>
