@@ -1,65 +1,45 @@
+<?php
+session_start(); // Start session
 
-<script>
-    // Function to check if the user is logged in
-function checkLoginStatus() {
-    return new Promise((resolve, reject) => {
-        // Simulate session check (in a real case, you would call a backend endpoint)
-        const isLoggedIn = sessionStorage.getItem('loggedin') === 'true';
-        resolve(isLoggedIn);
-    });
+// Database connection details
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "videos";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
+
+// Check if user is logged in
+$isLoggedIn = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
 // Fetch gallery data
-function fetchGalleryData() {
-    return fetch('/api/getGallery') // Assuming an API endpoint for gallery data
-        .then(response => response.json())
-        .then(data => data)
-        .catch(error => console.error('Error fetching gallery data:', error));
-}
+$sql = "SELECT id, image_url, title, vpcode FROM gallery ORDER BY RAND()";
+$result = $conn->query($sql);
 
-// Fetch user profile picture
-function fetchUserProfilePicture(userId) {
-    return fetch(`/api/getUserProfilePicture?userId=${userId}`) // Assuming an API endpoint for profile picture
-        .then(response => response.json())
-        .then(data => {
-            return data.profilePicture || 'Images/default-pf-pic.jpg'; // Default picture if not found
-        })
-        .catch(error => {
-            console.error('Error fetching user profile picture:', error);
-            return 'Images/default-pf-pic.jpg'; // Default picture if error occurs
-        });
-}
-
-// Main function to combine everything
-async function loadData() {
-    try {
-        const isLoggedIn = await checkLoginStatus();
-
-        // Fetch gallery data
-        const galleryData = await fetchGalleryData();
-
-        let profilePicture = 'Images/default-pf-pic.jpg'; // Default profile picture
-
-        if (isLoggedIn) {
-            const userId = sessionStorage.getItem('user_id'); // Assuming user_id is stored in sessionStorage
-            if (userId) {
-                profilePicture = await fetchUserProfilePicture(userId);
-            }
-        }
-
-        console.log('Gallery Data:', galleryData);
-        console.log('Profile Picture:', profilePicture);
-    } catch (error) {
-        console.error('Error loading data:', error);
+// Fetch user's profile picture if logged in
+$profilePicture = 'Images/default-pf-pic.jpg'; // Default picture
+if ($isLoggedIn && isset($_SESSION['user_id'])) {
+    $userId = $_SESSION['user_id'];
+    $profileQuery = "SELECT profile_picture FROM user_database.users WHERE id = ?";
+    $stmt = $conn->prepare($profileQuery);
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $stmt->bind_result($profilePictureFromDb);
+    if ($stmt->fetch() && $profilePictureFromDb) {
+        $profilePicture = $profilePictureFromDb;
     }
+    $stmt->close();
 }
-
-loadData();
-
+?>
+<script>
     function searchMovies() {
         const searchInput = document.getElementById('search-input').value;
         if (searchInput.trim() !== "") {
-            window.location.href = `search.html?query=${encodeURIComponent(searchInput)}`;
+            window.location.href = `search.php?query=${encodeURIComponent(searchInput)}`;
         }
     }
 
@@ -75,7 +55,7 @@ loadData();
 
     // Redirect to profile page
     function goToProfile() {
-        window.location.href = 'profile.html';
+        window.location.href = 'profile.php';
     }
 </script>
 
@@ -200,111 +180,18 @@ loadData();
     </style>
 </head>
 <body>
-<script>
-    // Function to check if the user is logged in
-function checkLoginStatus() {
-    return sessionStorage.getItem('loggedin') === 'true'; // Assuming login status is stored in sessionStorage
-}
-
-// Function to show the login popup if not logged in
-function showLoginPopup() {
-    if (!checkLoginStatus()) {
-        const overlay = document.createElement('div');
-        overlay.classList.add('overlay', 'show');
-
-        const loginPopup = document.createElement('div');
-        loginPopup.classList.add('login-popup', 'show');
-
-        const title = document.createElement('h3');
-        title.textContent = 'Please Log In';
-
-        const message = document.createElement('p');
-        message.textContent = 'You must log in to access this page.';
-
-        const loginButton = document.createElement('button');
-        loginButton.classList.add('button-85');
-        loginButton.setAttribute('role', 'button');
-        loginButton.textContent = 'Log In';
-
-        // On button click, redirect to login page
-        loginButton.onclick = () => {
-            window.location.href = 'login.html';
-        };
-
-        // Append the title, message, and button to the popup
-        loginPopup.appendChild(title);
-        loginPopup.appendChild(message);
-        loginPopup.appendChild(loginButton);
-
-        // Append the overlay and popup to the body
-        document.body.appendChild(overlay);
-        document.body.appendChild(loginPopup);
-    }
-}
-
-// Call the function to show the login popup if not logged in
-showLoginPopup();
-// Function to check if the user is logged in
-function checkLoginStatus() {
-    return sessionStorage.getItem('loggedin') === 'true'; // Assuming login status is stored in sessionStorage
-}
-
-// Function to fetch the user profile picture from the API
-async function fetchUserProfilePicture(userId) {
-    try {
-        const response = await fetch(`/api/getUserProfilePicture?userId=${userId}`);
-        const data = await response.json();
-        return data.profilePicture || 'Images/default-pf-pic.jpg'; // Default picture if not found
-    } catch (error) {
-        console.error('Error fetching user profile picture:', error);
-        return 'Images/default-pf-pic.jpg'; // Default picture in case of error
-    }
-}
-
-// Function to handle the profile click (navigate to profile page)
-function goToProfile() {
-    window.location.href = 'profile.html'; // Replace with actual profile page URL
-}
-
-// Main function to load user profile data
-async function loadProfile() {
-    try {
-        let profilePicture = 'Images/default-pf-pic.jpg'; // Default profile picture
-
-        if (checkLoginStatus()) {
-            const userId = sessionStorage.getItem('user_id'); // Assuming user_id is stored in sessionStorage
-            if (userId) {
-                profilePicture = await fetchUserProfilePicture(userId);
-            }
-        }
-
-        // Display the profile picture and set the click event for the profile
-        const profileDiv = document.createElement('div');
-        profileDiv.classList.add('profile');
-        profileDiv.onclick = goToProfile;
-
-        const imgElement = document.createElement('img');
-        imgElement.src = profilePicture;
-        imgElement.alt = 'Profile Picture';
-
-        // Append the image to the profile div
-        profileDiv.appendChild(imgElement);
-
-        // Add the profile div to the DOM (assuming there is an element with id 'profile-container')
-        document.getElementById('profile-container').appendChild(profileDiv);
-    } catch (error) {
-        console.error('Error loading profile data:', error);
-    }
-}
-
-// Call the function to load and render the profile section when the page loads
-loadProfile();
-
-</script>
+<?php if (!$isLoggedIn): ?>
+    <div class="overlay show"></div>
+    <div class="login-popup show">
+        <h3>Please Log In</h3>
+        <p>You must log in to access this page.</p>
+        <button class="button-85" role="button" onclick="window.location.href='login.php'">Log In</button>
+    </div>
+<?php endif; ?>
 
     <nav class="navbar">
         <!-- Logo -->
-        <a href="index.html" style="text-decoration: none;">
+        <a href="index.php" style="text-decoration: none;">
             <div class="logo" title="Moviezoon">M</div>
         </a>
 
@@ -320,94 +207,52 @@ loadProfile();
 
         <!-- Language Dropdown -->
         <div class="language-dropdown">
-            <button class="btn" type="button" onclick="window.location.href='urdu.html'">Urdu</button>
-            <button class="btn" type="button" onclick="window.location.href='punjabi.html'">Punjabi</button>
-            <button class="btn" type="button" onclick="window.location.href='english.html'">English</button>
-            <button class="btn" type="button" onclick="window.location.href='hindi.html'">Hindi</button>
-            <button class="btn" type="button" onclick="window.location.href='h-dubbed.html'">H-Dubbed</button>
+            <button class="btn" type="button" onclick="window.location.href='urdu.php'">Urdu</button>
+            <button class="btn" type="button" onclick="window.location.href='punjabi.php'">Punjabi</button>
+            <button class="btn" type="button" onclick="window.location.href='english.php'">English</button>
+            <button class="btn" type="button" onclick="window.location.href='hindi.php'">Hindi</button>
+            <button class="btn" type="button" onclick="window.location.href='h-dubbed.php'">H-Dubbed</button>
         </div>
 
         <!-- Language Dropdown for Mobile -->
         <div class="mobile-language-dropdown">
             <button class="btn dropdown-toggle" onclick="toggleDropdown()">Language</button>
             <div class="dropdown-content" id="dropdown-content">
-                <a href="urdu.html">Urdu</a>
-                <a href="punjabi.html">Punjabi</a>
-                <a href="english.html">English</a>
-                <a href="hindi.html">Hindi</a>
-                <a href="h-dubbed.html">H-Dubbed</a>
+                <a href="urdu.php">Urdu</a>
+                <a href="punjabi.php">Punjabi</a>
+                <a href="english.php">English</a>
+                <a href="hindi.php">Hindi</a>
+                <a href="h-dubbed.php">H-Dubbed</a>
             </div>
         </div>
 
         <!-- Profile Icon -->
-        <div id="profile-container"></div> <!-- Container for the profile picture -->
-
+        <div class="profile" onclick="goToProfile()">
+            <img src="<?php echo htmlspecialchars($profilePicture); ?>" alt="Profile Picture">
+        </div>
     </nav>
 
     <div class="sidebar">
-        <a href="playlist.html" title="Playlist" class="playlist-img"></a>
-        <a href="Watched.html" title="Just Watched" class="justwatched-img"></a>
-        <a href="Liked.html" title="Liked" class="liked-img"></a>
+        <a href="playlist.php" title="Playlist" class="playlist-img"></a>
+        <a href="Watched.php" title="Just Watched" class="justwatched-img"></a>
+        <a href="Liked.php" title="Liked" class="liked-img"></a>
     </div>
 
     <div class="gallery">
-    <div id="gallery-container"></div> <!-- Container where gallery will be rendered -->
+        <?php
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo '<div class="frame" id="picture-' . $row["id"] . '" onclick="window.location.href=\'video.php?vpcode=' . $row["vpcode"] . '\'">';
+                echo '<img src="' . $row["image_url"] . '" alt="' . $row["title"] . '">';
+                echo '<div class="title">' . $row["title"] . '</div>';
+                echo '</div>';
+            }
+        } else {
+            echo "<p>No pictures available.</p>";
+        }
 
-        <script>
-
-// Function to render gallery items
-function renderGallery(galleryData) {
-    const galleryContainer = document.getElementById('gallery-container'); // Assuming there's a container with id "gallery-container"
-
-    if (galleryData.length > 0) {
-        galleryData.forEach(item => {
-            const frame = document.createElement('div');
-            frame.classList.add('frame');
-            frame.id = `picture-${item.id}`;
-
-            // Set onclick event for the frame
-            frame.onclick = () => {
-                window.location.href = `video.html?vpcode=${item.vpcode}`;
-            };
-
-            // Create image element
-            const image = document.createElement('img');
-            image.src = item.image_url;
-            image.alt = item.title;
-
-            // Create title element
-            const title = document.createElement('div');
-            title.classList.add('title');
-            title.textContent = item.title;
-
-            // Append image and title to the frame
-            frame.appendChild(image);
-            frame.appendChild(title);
-
-            // Append the frame to the gallery container
-            galleryContainer.appendChild(frame);
-        });
-    } else {
-        // If no items are available, show a message
-        const noItemsMessage = document.createElement('p');
-        noItemsMessage.textContent = 'No pictures available.';
-        galleryContainer.appendChild(noItemsMessage);
-    }
-}
-
-// Main function to load and display gallery data
-async function loadGallery() {
-    try {
-        const galleryData = await fetchGalleryData();
-        renderGallery(galleryData);
-    } catch (error) {
-        console.error('Error loading gallery:', error);
-    }
-}
-
-// Call the function to load and render the gallery when the page loads
-loadGallery();
-        </script>
+        $conn->close();
+        ?>
     </div>
 
 <script>
