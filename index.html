@@ -2,10 +2,10 @@
 session_start(); // Start session
 
 // Database connection details
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "videos";
+$servername = "sql305.infinityfree.com";
+$username = "if0_37763535";
+$password = "wsTLWNpFHtoByp ";
+$dbname = "if0_37763535_videos";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -39,7 +39,7 @@ if ($isLoggedIn && isset($_SESSION['user_id'])) {
     function searchMovies() {
         const searchInput = document.getElementById('search-input').value;
         if (searchInput.trim() !== "") {
-            window.location.href = `search.php?query=${encodeURIComponent(searchInput)}`;
+            window.location.href = `search.html?query=${encodeURIComponent(searchInput)}`;
         }
     }
 
@@ -55,7 +55,7 @@ if ($isLoggedIn && isset($_SESSION['user_id'])) {
 
     // Redirect to profile page
     function goToProfile() {
-        window.location.href = 'profile.php';
+        window.location.href = 'profile.html';
     }
 </script>
 
@@ -185,13 +185,13 @@ if ($isLoggedIn && isset($_SESSION['user_id'])) {
     <div class="login-popup show">
         <h3>Please Log In</h3>
         <p>You must log in to access this page.</p>
-        <button class="button-85" role="button" onclick="window.location.href='login.php'">Log In</button>
+        <button class="button-85" role="button" onclick="window.location.href='login.html'">Log In</button>
     </div>
 <?php endif; ?>
 
     <nav class="navbar">
         <!-- Logo -->
-        <a href="index.php" style="text-decoration: none;">
+        <a href="index.html" style="text-decoration: none;">
             <div class="logo" title="Moviezoon">M</div>
         </a>
 
@@ -207,22 +207,22 @@ if ($isLoggedIn && isset($_SESSION['user_id'])) {
 
         <!-- Language Dropdown -->
         <div class="language-dropdown">
-            <button class="btn" type="button" onclick="window.location.href='urdu.php'">Urdu</button>
-            <button class="btn" type="button" onclick="window.location.href='punjabi.php'">Punjabi</button>
-            <button class="btn" type="button" onclick="window.location.href='english.php'">English</button>
-            <button class="btn" type="button" onclick="window.location.href='hindi.php'">Hindi</button>
-            <button class="btn" type="button" onclick="window.location.href='h-dubbed.php'">H-Dubbed</button>
+            <button class="btn" type="button" onclick="window.location.href='urdu.html'">Urdu</button>
+            <button class="btn" type="button" onclick="window.location.href='punjabi.html'">Punjabi</button>
+            <button class="btn" type="button" onclick="window.location.href='english.html'">English</button>
+            <button class="btn" type="button" onclick="window.location.href='hindi.html'">Hindi</button>
+            <button class="btn" type="button" onclick="window.location.href='h-dubbed.html'">H-Dubbed</button>
         </div>
 
         <!-- Language Dropdown for Mobile -->
         <div class="mobile-language-dropdown">
             <button class="btn dropdown-toggle" onclick="toggleDropdown()">Language</button>
             <div class="dropdown-content" id="dropdown-content">
-                <a href="urdu.php">Urdu</a>
-                <a href="punjabi.php">Punjabi</a>
-                <a href="english.php">English</a>
-                <a href="hindi.php">Hindi</a>
-                <a href="h-dubbed.php">H-Dubbed</a>
+                <a href="urdu.html">Urdu</a>
+                <a href="punjabi.html">Punjabi</a>
+                <a href="english.html">English</a>
+                <a href="hindi.html">Hindi</a>
+                <a href="h-dubbed.html">H-Dubbed</a>
             </div>
         </div>
 
@@ -233,16 +233,16 @@ if ($isLoggedIn && isset($_SESSION['user_id'])) {
     </nav>
 
     <div class="sidebar">
-        <a href="playlist.php" title="Playlist" class="playlist-img"></a>
-        <a href="Watched.php" title="Just Watched" class="justwatched-img"></a>
-        <a href="Liked.php" title="Liked" class="liked-img"></a>
+        <a href="playlist.html" title="Playlist" class="playlist-img"></a>
+        <a href="Watched.html" title="Just Watched" class="justwatched-img"></a>
+        <a href="Liked.html" title="Liked" class="liked-img"></a>
     </div>
 
     <div class="gallery">
         <?php
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
-                echo '<div class="frame" id="picture-' . $row["id"] . '" onclick="window.location.href=\'video.php?vpcode=' . $row["vpcode"] . '\'">';
+                echo '<div class="frame" id="picture-' . $row["id"] . '" onclick="window.location.href=\'video.html?vpcode=' . $row["vpcode"] . '\'">';
                 echo '<img src="' . $row["image_url"] . '" alt="' . $row["title"] . '">';
                 echo '<div class="title">' . $row["title"] . '</div>';
                 echo '</div>';
